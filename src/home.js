@@ -1,4 +1,5 @@
-import {createToDo, updatePage} from "./to-do-controller.js"
+import {createToDo, updatePage, updateProject} from "./to-do-controller.js";
+import {projectsArray, createNewProject, updateProjectsDOM} from "./project-controller.js";
 
 function structure() {
     // Assign body DOM element to a variable
@@ -15,29 +16,42 @@ function structure() {
 
     //Display on the left for projects
     const projectDisplay = document.createElement("div");
-    projectDisplay.classList.add("projectsDisplay");
-    const defaultProjects = document.createElement("div");
-    defaultProjects.classList.add("defaultProjects");
-    projectDisplay.appendChild(defaultProjects);
-    const mainProject = document.createElement("div");
-    const todayProject = document.createElement("div");
-    mainProject.classList.add("mainProject", "project");
-    mainProject.textContent = "HOME";
-    todayProject.classList.add("todayProject", "project");
-    todayProject.textContent = "TODAY";
-    defaultProjects.appendChild(mainProject);
-    defaultProjects.appendChild(todayProject);
-    const userProjects = document.createElement("div");
-    userProjects.classList.add("userProjects");
-    const userProjectTitle = document.createElement("p");
-    userProjectTitle.innerText = "My Projects";
-    userProjects.appendChild(userProjectTitle);
+    projectDisplay.classList.add("projects-display");
+
+    const projectArea = document.createElement("div");
+    projectArea.classList.add("project-area");
+    projectArea.setAttribute("id", "project-area");
+    projectDisplay.appendChild(projectArea);
+    
+
     const addProjectBtn = document.createElement("button");
     addProjectBtn.classList.add("addProjectBtn");
     addProjectBtn.textContent = "+ Add Project";
-    userProjects.appendChild(addProjectBtn);
-    projectDisplay.appendChild(userProjects);
-    // REMEMBER TO CREATE A NEW MODULE TO DISPLAY USER-CREATED PROJECTS
+    projectDisplay.appendChild(addProjectBtn);
+
+    //Create form for project creation
+    const projectForm = document.createElement("form");
+    projectForm.classList.add("project-form");
+
+    const projectTitleLabel = document.createElement("label");
+    projectTitleLabel.setAttribute("for", "project-title");
+    projectTitleLabel.textContent = "Project Name:"
+
+    const projectTitle = document.createElement("input");
+    projectTitle.setAttribute("type", "text");
+    projectTitle.setAttribute("name", "project-title");
+    projectTitle.setAttribute("id", "project-title");
+
+    const submitProjectBtn = document.createElement("input");
+    submitProjectBtn.setAttribute("type", "submit");
+    submitProjectBtn.setAttribute("name", "add-project");
+    submitProjectBtn.setAttribute("id", "add-project");
+    submitProjectBtn.setAttribute("value", "Add");
+
+    projectForm.appendChild(projectTitleLabel);
+    projectForm.appendChild(projectTitle);
+    projectForm.appendChild(submitProjectBtn);
+    projectDisplay.appendChild(projectForm);
 
     //Create main display
     const itemDisplay = document.createElement("div");
@@ -51,25 +65,45 @@ function structure() {
     // Create a form to fill for the todo
     const toDoForm = document.createElement("form");
     toDoForm.classList.add("to-do-form");
+
     const toDoTitleLabel = document.createElement("label");
     toDoTitleLabel.setAttribute("for", "task-title");
-    toDoTitleLabel.textContent = "Title:"
+    toDoTitleLabel.textContent = "Description:"
+
     const toDoTitle = document.createElement("input");
     toDoTitle.setAttribute("type", "text");
     toDoTitle.setAttribute("name", "task-title");
     toDoTitle.setAttribute("id", "task-title");
+
     const toDoDateLabel = document.createElement("label");
     toDoDateLabel.setAttribute("for", "task-date");
     toDoDateLabel.textContent = "Date:"
+
     const toDoDate = document.createElement("input");
     toDoDate.setAttribute("type", "text");
     toDoDate.setAttribute("name", "task-date");
     toDoDate.setAttribute("id", "task-date");
+
+    const projectSelector = document.createElement("select");
+    projectSelector.setAttribute("name", "projectSelector");
+    projectSelector.setAttribute("id", "projectSelector");
+    function updateSelect() {
+        projectSelector.textContent = "";
+        for(let i = 0; i < projectsArray.length; i++){
+            let option = document.createElement("option");
+            option.setAttribute("value", projectsArray[i].name);
+            option.textContent = projectsArray[i].name;
+            projectSelector.appendChild(option);
+        }
+    }
+    updateSelect();
+    
+    
     const submitToDoBtn = document.createElement("input");
     submitToDoBtn.setAttribute("type", "submit");
     submitToDoBtn.setAttribute("name", "submit");
     submitToDoBtn.setAttribute("id", "submit");
-    submitToDoBtn.textContent = "Submit";
+    submitToDoBtn.setAttribute("value", "Add");
     
     const addToDoBtn = document.createElement("button");
     addToDoBtn.classList.add("addToDoBtn");
@@ -77,7 +111,9 @@ function structure() {
 
     const taskArea = document.createElement("div");
     taskArea.classList.add("task-area");
-    taskArea.setAttribute("id", "taskArea");
+    taskArea.setAttribute("id", "task-area");
+
+    updateProjectsDOM(projectArea);
 
     toDoBlock.appendChild(toDoForm);
     toDoDisplay.appendChild(addToDoBtn);
@@ -92,7 +128,28 @@ function structure() {
     toDoForm.appendChild(toDoTitle);
     toDoForm.appendChild(toDoDateLabel);
     toDoForm.appendChild(toDoDate);
+    toDoForm.appendChild(projectSelector);
     toDoForm.appendChild(submitToDoBtn);
+
+    addProjectBtn.addEventListener("click", function() {
+        console.log("working")
+        if (projectForm.style.display == "flex") {
+            projectForm.style.display = "none";
+        }
+        else {
+            projectForm.style.display = "flex";
+        }
+    });
+
+    submitProjectBtn.addEventListener("click", function(event) {
+        event.preventDefault();
+        let name = document.getElementById("project-title");
+        createNewProject(name.value);
+        name.value = "";
+        updateProjectsDOM(projectArea);
+        projectForm.style.display = "none";
+        updateSelect();
+    });
 
     addToDoBtn.addEventListener("click", function() {
         if (toDoBlock.style.display == "inline") {
@@ -101,25 +158,21 @@ function structure() {
         else {
             toDoBlock.style.display = "inline";
         }
-    })
+    });
 
     submitToDoBtn.addEventListener("click", function(event) {
         event.preventDefault();
         let title = document.getElementById("task-title");
         let date = document.getElementById("task-date");
-        createToDo(title.value, date.value);
+        let selectedProject = document.getElementById("projectSelector")
+        createToDo(title.value, date.value, selectedProject.value);
         title.value = "";
         date.value = "";
-        updatePage(taskArea);
-        console.log(taskArea);
-        console.log(itemDisplay)
-    })
+        updatePage(taskArea, selectedProject.value);
+    });
 
-
-    updatePage(taskArea);
+    updatePage(taskArea, "Main");
+    
 }
-
-
-
 
 export {structure}
