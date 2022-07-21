@@ -17,15 +17,6 @@ function addProjectLocalStorage() {
   localStorage.setItem('projectsArray', JSON.stringify(projectsArray));
 }
 
-/**
- * The function getProjectLocalStorage() is called, which calls the localStorage.getItem() method,
- * which returns the value of the projectsArray key in the localStorage object
- */
-function getProjectLocalStorage() {
-  const storedProjects = localStorage.getItem('projectsArray');
-  console.log(storedProjects);
-}
-
 function Project(name) {
   (this.name = name), (this.tasks = []);
 }
@@ -34,7 +25,6 @@ function createNewProject(name) {
   const project = new Project(name);
   projectsArray.push(project);
   addProjectLocalStorage();
-  getProjectLocalStorage();
 }
 
 function updatePageWithProject(event, page) {
