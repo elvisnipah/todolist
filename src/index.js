@@ -1,4 +1,3 @@
-import {structure} from "./home.js";
-
+import { structure } from "./home.js";
 
 structure();
