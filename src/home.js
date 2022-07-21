@@ -80,7 +80,7 @@ function structure() {
     toDoDateLabel.textContent = "Date:"
 
     const toDoDate = document.createElement("input");
-    toDoDate.setAttribute("type", "text");
+    toDoDate.setAttribute("type", "date");
     toDoDate.setAttribute("name", "task-date");
     toDoDate.setAttribute("id", "task-date");
 
@@ -113,7 +113,7 @@ function structure() {
     taskArea.classList.add("task-area");
     taskArea.setAttribute("id", "task-area");
 
-    updateProjectsDOM(projectArea);
+    updateProjectsDOM(projectArea, taskArea);
 
     toDoBlock.appendChild(toDoForm);
     toDoDisplay.appendChild(addToDoBtn);
@@ -146,7 +146,7 @@ function structure() {
         let name = document.getElementById("project-title");
         createNewProject(name.value);
         name.value = "";
-        updateProjectsDOM(projectArea);
+        updateProjectsDOM(projectArea, taskArea);
         projectForm.style.display = "none";
         updateSelect();
     });
@@ -166,13 +166,13 @@ function structure() {
         let date = document.getElementById("task-date");
         let selectedProject = document.getElementById("projectSelector")
         createToDo(title.value, date.value, selectedProject.value);
+        console.log(date.value)
         title.value = "";
         date.value = "";
-        updatePage(taskArea, selectedProject.value);
+        updatePage(taskArea);
     });
 
-    updatePage(taskArea, "Main");
-    
+    updatePage(taskArea);
 }
 
 export {structure}
